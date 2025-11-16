@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import CanvasGrafo from './componentes/CanvasGrafo';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [nodos, setNodos] = useState([
+    { id: 1, color: null },
+    { id: 2, color: null },
+    { id: 3, color: null }
+  ]);
+
+  const [aristas, setAristas] = useState([
+    { desde: 1, hasta: 2 },
+    { desde: 2, hasta: 3 }
+  ]);
+
+  const manejarClickNodo = (idNodo) => {
+    console.log('Nodo clickeado:', idNodo);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
+          Coloración Probabilística de Grafos
+        </h1>
+        
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <CanvasGrafo 
+            nodos={nodos}
+            aristas={aristas}
+            onNodoClick={manejarClickNodo}
+          />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
