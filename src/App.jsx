@@ -2,6 +2,7 @@ import { useState } from 'react';
 import CanvasGrafo from './componentes/CanvasGrafo';
 import PanelControl from './componentes/PanelControl';
 import PanelAlgoritmo from './componentes/PanelAlgoritmo';
+import PanelEstadisticas from './componentes/PanelEstadisticas';
 import ModalRecoloracion from './componentes/ModalRecoloracion';
 import { algoritmoLasVegas } from './algoritmos/lasVegas';
 import { algoritmoMonteCarlo } from './algoritmos/monteCarlo';
@@ -23,6 +24,7 @@ function App() {
 
   const [contadorNodos, setContadorNodos] = useState(4);
   const [estadisticas, setEstadisticas] = useState(null);
+  const [historialEjecuciones, setHistorialEjecuciones] = useState([]);
   const [nodoSeleccionado, setNodoSeleccionado] = useState(null);
   const [numColores, setNumColores] = useState(3);
 
@@ -119,13 +121,17 @@ function App() {
 
     const conflictos = contarConflictos(resultado.nodos, aristas);
     
-    setEstadisticas({
+    const nuevasEstadisticas = {
       tipo: resultado.tipo,
       iteraciones: resultado.iteraciones,
       tiempo: resultado.tiempo,
       conflictos: conflictos,
-      exito: resultado.exito
-    });
+      exito: resultado.exito,
+      evolucion: resultado.evolucion || []
+    };
+
+    setEstadisticas(nuevasEstadisticas);
+    setHistorialEjecuciones([...historialEjecuciones, nuevasEstadisticas]);
   };
 
   // Manejar click en nodo - abrir modal de recoloración
@@ -145,14 +151,9 @@ function App() {
     const nodosActualizados = recolorearNodo(nodos, aristas, idNodo, nuevoColor);
     setNodos(nodosActualizados);
     
-    // Actualizar estadísticas
     if (estadisticas) {
       const nuevosConflictos = contarConflictos(nodosActualizados, aristas);
-      setEstadisticas({
-        ...estadisticas,
-        conflictos: nuevosConflictos,
-        exito: nuevosConflictos === 0
-      });
+      setEstadisticas({ ...estadisticas, conflictos: nuevosConflictos, exito: nuevosConflictos === 0 });
     }
   };
 
@@ -176,7 +177,7 @@ function App() {
           estadisticas={estadisticas}
         />
         
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <p className="text-sm text-gray-600 mb-3 italic">
             💡 Tip: Haz click en un nodo coloreado para recolorearlo manualmente
           </p>
@@ -187,6 +188,11 @@ function App() {
             coloresConflicto={conflictosVisuales}
           />
         </div>
+
+        <PanelEstadisticas 
+          estadisticas={estadisticas}
+          historialEjecuciones={historialEjecuciones}
+        />
       </div>
 
       {nodoSeleccionado && (
