@@ -13,7 +13,7 @@ export const algoritmoLasVegas = (nodos, aristas, numColores, maxIteraciones, bu
     iteraciones++;
 
     // Asignar colores aleatorios a todos los nodos
-    nodosColoreados = nodos.map(nodo => ({...nodo, color: generarColorAleatorio(numColores)}));
+    nodosColoreados = nodos.map(nodo => ({ ...nodo, color: generarColorAleatorio(numColores) }));
 
     // Verificar si la coloración es válida
     if (esColoracionValida(nodosColoreados, aristas)) {
