@@ -178,9 +178,18 @@ function App() {
         />
         
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <p className="text-sm text-gray-600 mb-3 italic">
-            💡 Tip: Haz click en un nodo coloreado para recolorearlo manualmente
-          </p>
+          <div className="flex justify-between items-center mb-3">
+            <p className="text-sm text-gray-600 italic">
+              💡 Tip: Haz click en un nodo coloreado para recolorearlo manualmente
+            </p>
+            {numColores > 3 && (
+              <div className="bg-purple-100 px-4 py-2 rounded-lg">
+                <p className="text-sm font-semibold text-purple-700">
+                  🎨 {numColores} posibles colores a usar (k-coloración)
+                </p>
+              </div>
+            )}
+          </div>
           <CanvasGrafo 
             nodos={nodos}
             aristas={aristas}
