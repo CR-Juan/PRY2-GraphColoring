@@ -2,8 +2,10 @@ import { useState } from 'react';
 import CanvasGrafo from './componentes/CanvasGrafo';
 import PanelControl from './componentes/PanelControl';
 import PanelAlgoritmo from './componentes/PanelAlgoritmo';
+import ModalRecoloracion from './componentes/ModalRecoloracion';
 import { algoritmoLasVegas } from './algoritmos/lasVegas';
 import { algoritmoMonteCarlo } from './algoritmos/monteCarlo';
+import { recolorearNodo } from './algoritmos/busquedaLocal';
 import { detectarConflictos, contarConflictos } from './utilidades/grafoUtils';
 import './App.css';
 
@@ -21,6 +23,8 @@ function App() {
 
   const [contadorNodos, setContadorNodos] = useState(4);
   const [estadisticas, setEstadisticas] = useState(null);
+  const [nodoSeleccionado, setNodoSeleccionado] = useState(null);
+  const [numColores, setNumColores] = useState(3);
 
   // Agregar un nuevo nodo
   const agregarNodo = () => {
@@ -91,6 +95,7 @@ function App() {
       return;
     }
 
+    setNumColores(config.numColores);
     let resultado;
 
     if (config.tipo === 'lasVegas') {
@@ -110,10 +115,8 @@ function App() {
       );
     }
 
-    // Actualizar nodos con los colores
     setNodos(resultado.nodos);
 
-    // Calcular estadísticas
     const conflictos = contarConflictos(resultado.nodos, aristas);
     
     setEstadisticas({
@@ -125,11 +128,34 @@ function App() {
     });
   };
 
+  // Manejar click en nodo - abrir modal de recoloración
   const manejarClickNodo = (idNodo) => {
-    console.log('Nodo clickeado:', idNodo);
+    const id = Number(idNodo);
+    const nodo = nodos.find(n => Number(n.id) === id);
+    
+    if (nodo && nodo.color) {
+      setNodoSeleccionado(nodo);
+    } else {
+      alert('Este nodo aún no tiene color asignado. Ejecuta un algoritmo primero.');
+    }
   };
 
-  // Detectar conflictos para visualización
+  // Recolorear nodo manualmente
+  const manejarRecoloracion = (idNodo, nuevoColor) => {
+    const nodosActualizados = recolorearNodo(nodos, aristas, idNodo, nuevoColor);
+    setNodos(nodosActualizados);
+    
+    // Actualizar estadísticas
+    if (estadisticas) {
+      const nuevosConflictos = contarConflictos(nodosActualizados, aristas);
+      setEstadisticas({
+        ...estadisticas,
+        conflictos: nuevosConflictos,
+        exito: nuevosConflictos === 0
+      });
+    }
+  };
+
   const conflictosVisuales = detectarConflictos(nodos, aristas);
 
   return (
@@ -151,6 +177,9 @@ function App() {
         />
         
         <div className="bg-white rounded-lg shadow-lg p-6">
+          <p className="text-sm text-gray-600 mb-3 italic">
+            💡 Tip: Haz click en un nodo coloreado para recolorearlo manualmente
+          </p>
           <CanvasGrafo 
             nodos={nodos}
             aristas={aristas}
@@ -159,6 +188,17 @@ function App() {
           />
         </div>
       </div>
+
+      {nodoSeleccionado && (
+        <ModalRecoloracion
+          nodo={nodoSeleccionado}
+          nodos={nodos}
+          aristas={aristas}
+          numColores={numColores}
+          onRecolorear={manejarRecoloracion}
+          onCerrar={() => setNodoSeleccionado(null)}
+        />
+      )}
     </div>
   );
 }

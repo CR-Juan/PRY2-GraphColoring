@@ -7,7 +7,7 @@ export const algoritmoMonteCarlo = (nodos, aristas, numColores, maxIteraciones) 
 
   for (let i = 0; i < maxIteraciones; i++) {
     // Asignar colores aleatorios
-    const nodosColoreados = nodos.map(nodo => ({...nodo, color: generarColorAleatorio(numColores)}));
+    const nodosColoreados = nodos.map(nodo => ({ ...nodo, color: generarColorAleatorio(numColores) }));
 
     // Contar conflictos
     const conflictos = contarConflictos(nodosColoreados, aristas);
