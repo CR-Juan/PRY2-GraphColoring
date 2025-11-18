@@ -5,13 +5,15 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
   const [numColores, setNumColores] = useState(3);
   const [maxIteraciones, setMaxIteraciones] = useState(1000);
   const [buscarSolucionValida, setBuscarSolucionValida] = useState(true);
+  const [autoIncrementoK, setAutoIncrementoK] = useState(false);
 
   const ejecutar = () => {
     onEjecutarAlgoritmo({
       tipo: tipoAlgoritmo,
       numColores,
       maxIteraciones,
-      buscarSolucionValida
+      buscarSolucionValida,
+      autoIncrementoK
     });
   };
 
@@ -45,12 +47,18 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
               value={numColores}
               onChange={(e) => setNumColores(parseInt(e.target.value))}
               className="w-full"
+              disabled={autoIncrementoK}
             />
+            {autoIncrementoK && (
+              <p className="text-xs text-blue-600 mt-1">
+                ℹ️ Se usará como k inicial para auto-incremento
+              </p>
+            )}
           </div>
 
           <div>
             <label className="block font-semibold mb-2">
-              Máximo de Iteraciones: {maxIteraciones}
+              {autoIncrementoK ? 'Intentos por valor de k:' : 'Máximo de Iteraciones:'} {maxIteraciones}
             </label>
             <input
               type="range"
@@ -61,19 +69,44 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
               onChange={(e) => setMaxIteraciones(parseInt(e.target.value))}
               className="w-full"
             />
+            {autoIncrementoK && maxIteraciones < 1000 && (
+              <p className="text-xs text-red-600 mt-1">
+                ⚠️ Recomendado: mínimo 1000 intentos
+              </p>
+            )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="solucionValida"
-              checked={buscarSolucionValida}
-              onChange={(e) => setBuscarSolucionValida(e.target.checked)}
-              className="w-4 h-4"
-            />
-            <label htmlFor="solucionValida" className="font-semibold">
-              Buscar solución válida (sin límite de intentos)
-            </label>
+          {!autoIncrementoK && (
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="solucionValida"
+                checked={buscarSolucionValida}
+                onChange={(e) => setBuscarSolucionValida(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <label htmlFor="solucionValida" className="font-semibold">
+                Buscar solución válida (sin límite de intentos)
+              </label>
+            </div>
+          )}
+
+          <div className="border-2 border-purple-300 bg-purple-50 rounded p-3">
+            <div className="flex items-center justify-center gap-2">
+              <input
+                type="checkbox"
+                id="autoIncremento"
+                checked={autoIncrementoK}
+                onChange={(e) => setAutoIncrementoK(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <label htmlFor="autoIncremento" className="font-semibold text-purple-700">
+                🧠 Auto-incremento de k
+              </label>
+            </div>
+            <p className="text-xs text-gray-600 mt-2 text-center">
+              Si no encuentra solución, incrementa k automáticamente
+            </p>
           </div>
 
           <button
@@ -90,6 +123,12 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
           {estadisticas ? (
             <div className="space-y-2 text-sm">
               <p><strong>Algoritmo:</strong> {estadisticas.tipo}</p>
+              {estadisticas.autoIncremento && (
+                <>
+                  <p><strong>k inicial:</strong> {estadisticas.kInicial}</p>
+                  <p><strong>k final:</strong> {estadisticas.kFinal}</p>
+                </>
+              )}
               <p><strong>Iteraciones:</strong> {estadisticas.iteraciones}</p>
               <p><strong>Tiempo:</strong> {estadisticas.tiempo}ms</p>
               <p><strong>Conflictos:</strong> {estadisticas.conflictos}</p>

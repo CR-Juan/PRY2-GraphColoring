@@ -6,6 +6,7 @@ import PanelEstadisticas from './componentes/PanelEstadisticas';
 import ModalRecoloracion from './componentes/ModalRecoloracion';
 import { algoritmoLasVegas } from './algoritmos/lasVegas';
 import { algoritmoMonteCarlo } from './algoritmos/monteCarlo';
+import { algoritmoConAutoIncrementoK } from './algoritmos/autoIncrementoK';
 import { recolorearNodo } from './algoritmos/busquedaLocal';
 import { detectarConflictos, contarConflictos } from './utilidades/grafoUtils';
 import './App.css';
@@ -100,21 +101,34 @@ function App() {
     setNumColores(config.numColores);
     let resultado;
 
-    if (config.tipo === 'lasVegas') {
-      resultado = algoritmoLasVegas(
+    // Si auto-incremento está activado
+    if (config.autoIncrementoK) {
+      console.log('Ejecutando con auto-incremento de k...');
+      resultado = algoritmoConAutoIncrementoK(
         nodos,
         aristas,
-        config.numColores,
-        config.maxIteraciones,
-        config.buscarSolucionValida
+        config.numColores, // k inicial
+        config.tipo,
+        config.maxIteraciones, // intentos por k
+        10 // k máximo
       );
     } else {
-      resultado = algoritmoMonteCarlo(
-        nodos,
-        aristas,
-        config.numColores,
-        config.maxIteraciones
-      );
+      if (config.tipo === 'lasVegas') {
+        resultado = algoritmoLasVegas(
+          nodos,
+          aristas,
+          config.numColores,
+          config.maxIteraciones,
+          config.buscarSolucionValida
+        );
+      } else {
+        resultado = algoritmoMonteCarlo(
+          nodos,
+          aristas,
+          config.numColores,
+          config.maxIteraciones
+        );
+      }
     }
 
     setNodos(resultado.nodos);
@@ -127,7 +141,10 @@ function App() {
       tiempo: resultado.tiempo,
       conflictos: conflictos,
       exito: resultado.exito,
-      evolucion: resultado.evolucion || []
+      evolucion: resultado.evolucion || [],
+      autoIncremento: resultado.autoIncremento || false,
+      kInicial: resultado.kInicial,
+      kFinal: resultado.kFinal
     };
 
     setEstadisticas(nuevasEstadisticas);
