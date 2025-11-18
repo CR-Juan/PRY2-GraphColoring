@@ -199,7 +199,7 @@ function App() {
             <p className="text-sm text-gray-600 italic">
               💡 Tip: Haz click en un nodo coloreado para recolorearlo manualmente
             </p>
-            {numColores > 3 && (
+            {numColores >= 3 && (
               <div className="bg-purple-100 px-4 py-2 rounded-lg">
                 <p className="text-sm font-semibold text-purple-700">
                   🎨 {numColores} posibles colores a usar (k-coloración)
