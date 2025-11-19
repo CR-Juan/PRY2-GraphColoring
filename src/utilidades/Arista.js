@@ -1,5 +1,3 @@
-import { fromJSON } from "postcss";
-
 export class Arista {
     constructor(desde, hasta, datosAdicionales = {}) {
         this.desde = desde;

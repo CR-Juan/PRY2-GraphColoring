@@ -1,5 +1,3 @@
-import { fromJSON } from "postcss";
-
 export class Nodo {
     constructor(id, color = null, datosAdicionales = {}) {
         this.id = id;

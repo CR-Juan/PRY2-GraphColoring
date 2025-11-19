@@ -6,127 +6,139 @@ import PanelEstadisticas from './componentes/PanelEstadisticas';
 import ModalRecoloracion from './componentes/ModalRecoloracion';
 import { algoritmoLasVegas } from './algoritmos/lasVegas';
 import { algoritmoMonteCarlo } from './algoritmos/monteCarlo';
-import { recolorearNodo } from './algoritmos/busquedaLocal';
-import { detectarConflictos, contarConflictos } from './utilidades/grafoUtils';
+import { Grafo } from './utilidades/Grafo';
+import { Nodo } from './utilidades/Nodo';
+import { Arista } from './utilidades/Arista';
 import './App.css';
 
 function App() {
-  const [nodos, setNodos] = useState([
-    { id: 1, color: null },
-    { id: 2, color: null },
-    { id: 3, color: null }
-  ]);
-
-  const [aristas, setAristas] = useState([
-    { desde: 1, hasta: 2 },
-    { desde: 2, hasta: 3 }
-  ]);
+  // Inicializar con un Grafo
+  const [grafo, setGrafo] = useState(() => {
+    const g = new Grafo();
+    g.agregarNodo(new Nodo(1));
+    g.agregarNodo(new Nodo(2));
+    g.agregarNodo(new Nodo(3));
+    g.agregarArista(new Arista(1, 2));
+    g.agregarArista(new Arista(2, 3));
+    return g;
+  });
 
   const [contadorNodos, setContadorNodos] = useState(4);
   const [estadisticas, setEstadisticas] = useState(null);
   const [historialEjecuciones, setHistorialEjecuciones] = useState([]);
   const [nodoSeleccionado, setNodoSeleccionado] = useState(null);
   const [numColores, setNumColores] = useState(3);
+  const nodos = grafo.nodos;
+  const aristas = grafo.aristas;
 
   // Agregar un nuevo nodo
   const agregarNodo = () => {
-    const nuevoNodo = { id: contadorNodos, color: null };
-    setNodos([...nodos, nuevoNodo]);
+    setGrafo(prev => {
+      const nuevoGrafo = prev.clonar();
+      nuevoGrafo.agregarNodo(new Nodo(contadorNodos));
+      return nuevoGrafo;
+    });
     setContadorNodos(contadorNodos + 1);
   };
 
   // Agregar una arista entre dos nodos
   const agregarArista = (desde, hasta) => {
-    const nodoDesdeExiste = nodos.find(n => n.id === desde);
-    const nodoHastaExiste = nodos.find(n => n.id === hasta);
-    
-    if (!nodoDesdeExiste || !nodoHastaExiste) {
-      alert('Ambos nodos deben existir');
-      return;
+    try {
+      setGrafo(prev => {
+        const nuevoGrafo = prev.clonar();
+        nuevoGrafo.agregarArista(new Arista(desde, hasta));
+        return nuevoGrafo;
+      });
+    } catch (error) {
+      alert(error.message);
     }
-
-    const aristaExiste = aristas.find(
-      a => (a.desde === desde && a.hasta === hasta) || (a.desde === hasta && a.hasta === desde)
-    );
-
-    if (aristaExiste) {
-      alert('Esta conexión ya existe');
-      return;
-    }
-
-    setAristas([...aristas, { desde, hasta }]);
   };
 
   // Generar un grafo aleatorio
   const generarGrafoAleatorio = () => {
     const numNodos = Math.floor(Math.random() * 5) + 5;
-    const nuevosNodos = [];
+    const nuevoGrafo = new Grafo();
     
+    // Agregar nodos
     for (let i = 1; i <= numNodos; i++) {
-      nuevosNodos.push({ id: i, color: null });
+      nuevoGrafo.agregarNodo(new Nodo(i));
     }
 
-    const nuevasAristas = [];
+    // Agregar aristas aleatorias
     const numAristas = Math.floor(Math.random() * numNodos) + numNodos;
+    let aristasCreadas = 0;
+    let intentos = 0;
+    const maxIntentos = numAristas * 3;
     
-    for (let i = 0; i < numAristas; i++) {
+    while (aristasCreadas < numAristas && intentos < maxIntentos) {
       const desde = Math.floor(Math.random() * numNodos) + 1;
       const hasta = Math.floor(Math.random() * numNodos) + 1;
       
-      if (desde !== hasta) {
-        const aristaExiste = nuevasAristas.find(
-          a => (a.desde === desde && a.hasta === hasta) || (a.desde === hasta && a.hasta === desde)
-        );
-        
-        if (!aristaExiste) {
-          nuevasAristas.push({ desde, hasta });
-        }
+      if (desde !== hasta && !nuevoGrafo.existeArista(desde, hasta)) {
+        try {
+          nuevoGrafo.agregarArista(new Arista(desde, hasta));
+          aristasCreadas++;
+        } catch (error) {}
       }
+      intentos++;
     }
 
-    setNodos(nuevosNodos);
-    setAristas(nuevasAristas);
+    setGrafo(nuevoGrafo);
     setContadorNodos(numNodos + 1);
     setEstadisticas(null);
   };
 
   // Ejecutar algoritmo de coloración
   const ejecutarAlgoritmo = (config) => {
-    if (nodos.length === 0) {
+    if (grafo.nodos.length === 0) {
       alert('Primero agrega nodos al grafo');
       return;
     }
 
     setNumColores(config.numColores);
+    
+    // convirtiendo a objetos planos para los algoritmos lol
+    const nodosPlanos = grafo.nodos.map(n => n.toJSON());
+    const aristasPlanas = grafo.aristas.map(a => a.toJSON());
+    
     let resultado;
 
     if (config.tipo === 'lasVegas') {
       resultado = algoritmoLasVegas(
-        nodos,
-        aristas,
+        nodosPlanos,
+        aristasPlanas,
         config.numColores,
         config.maxIteraciones,
         config.buscarSolucionValida
       );
     } else {
       resultado = algoritmoMonteCarlo(
-        nodos,
-        aristas,
+        nodosPlanos,
+        aristasPlanas,
         config.numColores,
         config.maxIteraciones
       );
     }
 
-    setNodos(resultado.nodos);
+    // crear un nuevo grafo con la coloración resultante
+    const nuevoGrafo = grafo.clonar();
+    resultado.nodos.forEach(nodoPlano => {
+      const nodo = nuevoGrafo.obtenerNodo(nodoPlano.id);
+      if (nodo) {
+        nodo.color = nodoPlano.color;
+      }
+    });
 
-    const conflictos = contarConflictos(resultado.nodos, aristas);
+    setGrafo(nuevoGrafo);
+
+    const conflictos = nuevoGrafo.contarConflictos();
     
     const nuevasEstadisticas = {
       tipo: resultado.tipo,
       iteraciones: resultado.iteraciones,
       tiempo: resultado.tiempo,
       conflictos: conflictos,
-      exito: resultado.exito,
+      exito: conflictos === 0,
       evolucion: resultado.evolucion || []
     };
 
@@ -137,10 +149,10 @@ function App() {
   // Manejar click en nodo - abrir modal de recoloración
   const manejarClickNodo = (idNodo) => {
     const id = Number(idNodo);
-    const nodo = nodos.find(n => Number(n.id) === id);
+    const nodo = grafo.obtenerNodo(id);
     
-    if (nodo && nodo.color) {
-      setNodoSeleccionado(nodo);
+    if (nodo && nodo.estaColoreado()) {
+      setNodoSeleccionado(nodo.toJSON());
     } else {
       alert('Este nodo aún no tiene color asignado. Ejecuta un algoritmo primero.');
     }
@@ -148,16 +160,29 @@ function App() {
 
   // Recolorear nodo manualmente
   const manejarRecoloracion = (idNodo, nuevoColor) => {
-    const nodosActualizados = recolorearNodo(nodos, aristas, idNodo, nuevoColor);
-    setNodos(nodosActualizados);
+    setGrafo(prev => {
+      const nuevoGrafo = prev.clonar();
+      const nodo = nuevoGrafo.obtenerNodo(idNodo);
+      if (nodo) {
+        nodo.colorear(nuevoColor);
+      }
+      return nuevoGrafo;
+    });
     
     if (estadisticas) {
-      const nuevosConflictos = contarConflictos(nodosActualizados, aristas);
-      setEstadisticas({ ...estadisticas, conflictos: nuevosConflictos, exito: nuevosConflictos === 0 });
+      const nuevosConflictos = grafo.contarConflictos();
+      setEstadisticas({ 
+        ...estadisticas, 
+        conflictos: nuevosConflictos, 
+        exito: nuevosConflictos === 0 
+      });
     }
+    
+    setNodoSeleccionado(null);
   };
 
-  const conflictosVisuales = detectarConflictos(nodos, aristas);
+  // su nombre lo dice todo
+  const conflictosVisuales = grafo.detectarConflictos();
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -182,8 +207,8 @@ function App() {
             💡 Tip: Haz click en un nodo coloreado para recolorearlo manualmente
           </p>
           <CanvasGrafo 
-            nodos={nodos}
-            aristas={aristas}
+            nodos={nodos.map(n => n.toJSON())}
+            aristas={aristas.map(a => a.toJSON())}
             onNodoClick={manejarClickNodo}
             coloresConflicto={conflictosVisuales}
           />
@@ -198,8 +223,8 @@ function App() {
       {nodoSeleccionado && (
         <ModalRecoloracion
           nodo={nodoSeleccionado}
-          nodos={nodos}
-          aristas={aristas}
+          nodos={nodos.map(n => n.toJSON())}
+          aristas={aristas.map(a => a.toJSON())}
           numColores={numColores}
           onRecolorear={manejarRecoloracion}
           onCerrar={() => setNodoSeleccionado(null)}
