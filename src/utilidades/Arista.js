@@ -7,9 +7,9 @@ export class Arista {
 
     conecta(nodo1, nodo2) {
         return (
-            this.desde === nodo1 && this.hasta === nodo2
-            || this.desde === nodo2 && this.hasta === nodo1
-        )
+            (this.desde === nodo1 && this.hasta === nodo2) ||
+            (this.desde === nodo2 && this.hasta === nodo1)
+        );
     }
 
     otroExtremo(nodo) {
@@ -19,8 +19,8 @@ export class Arista {
     }
 
     tieneConflicto(nodos) {
-        const nodo1 = nodos.find(n=> n.id === this.desde);
-        const nodo2 = nodos.find(n=> n.id === this.hasta);
+        const nodo1 = nodos.find(n => n.id === this.desde);
+        const nodo2 = nodos.find(n => n.id === this.hasta);
 
         if (!nodo1 || !nodo2) return false;
         if (!nodo1.estaColoreado() || !nodo2.estaColoreado()) return false;
@@ -36,7 +36,7 @@ export class Arista {
         };
     }
 
-    static fromJSON (json) {
+    static fromJSON(json) {
         const {desde, hasta, ...datosAdicionales} = json;
         return new Arista(desde, hasta, datosAdicionales);
     }

@@ -15,22 +15,20 @@ export class Nodo {
 
     obtenerVecinos(aristas) {
         return aristas.filter(
-            a=> a.desde === this.id || a.hasta === this.id
+            a => a.desde === this.id || a.hasta === this.id
         ).map(
-            a=> a.desde === this.id ? a.hasta : a.desde
-        )
+            a => a.desde === this.id ? a.hasta : a.desde
+        );
     }
 
     tieneConflicto(aristas, nodos) {
         if (!this.estaColoreado()) return false;
 
         const vecinos = this.obtenerVecinos(aristas);
-        return vecinos.some(
-            vecinosId =>{
-                const vecino = nodos.find(n=> n.id === vecinosId);
-                return vecino && vecino.color === this.color;
-            }
-        )
+        return vecinos.some(vecinoId => {
+            const vecino = nodos.find(n => n.id === vecinoId);
+            return vecino && vecino.color === this.color;
+        });
     }
 
     clonar() {
@@ -45,7 +43,7 @@ export class Nodo {
         };
     }
 
-    static fromJSON (json) {
+    static fromJSON(json) {
         const {id, color, ...datosAdicionales} = json;
         return new Nodo(id, color, datosAdicionales);
     }

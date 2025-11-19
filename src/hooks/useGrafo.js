@@ -21,17 +21,29 @@ export const useGrafo = () => {
             const nuevoGrafo = p.clonar();
             nuevoGrafo.agregarNodo(new Nodo(contarNodos));
             return nuevoGrafo;
-        })
+        });
         setContarNodos(p => p + 1);
     };
 
     const agregarArista = (desde, hasta) => {
+        const nodoDesdeExiste = grafo.existeNodo(desde);
+        const nodoHastaExiste = grafo.existeNodo(hasta);
+
+        if (!nodoDesdeExiste || !nodoHastaExiste) {
+            alert('Ambos nodos deben existir');
+            return;
+        }
+        if (grafo.existeArista(desde, hasta)) {
+            alert('Esta conexión ya existe');
+            return;
+        }
+
         try {
             setGrafo(p => {
                 const nuevoGrafo = p.clonar();
                 nuevoGrafo.agregarArista(new Arista(desde, hasta));
                 return nuevoGrafo;
-            })
+            });
         } catch (error) {
             alert(error.message);
         }
@@ -54,14 +66,17 @@ export const useGrafo = () => {
             const desde = Math.floor(Math.random() * numNodos) + 1;
             const hasta = Math.floor(Math.random() * numNodos) + 1;
 
-            if (desde !== hasta && !nuevoGrafo.existeAristaEntre(desde, hasta)) {
+            if (desde !== hasta && !nuevoGrafo.existeArista(desde, hasta)) {
                 try {
                     nuevoGrafo.agregarArista(new Arista(desde, hasta));
                     creados++;
-                } catch (error) {}
+                } catch (error) {
+                    console.error('Error agregando arista:', error);
+                }
             }
             intentos++;
         }
+        
         setGrafo(nuevoGrafo);
         setContarNodos(numNodos + 1);
     };
@@ -78,6 +93,6 @@ export const useGrafo = () => {
         agregarArista,
         generarGrafoAleatorio,
         actualizarGrafo,
-        conflictos: grafo.detectarConflictos(),
+        conflictos: grafo.detectarConflictos()
     };
 };
