@@ -1,4 +1,10 @@
 // Generar colores aleatorios en formato hex
+
+/**
+ * Genera un color aleatorio a partir de una lista de colores predefinidos.
+ * @param {number} k - Cantidad de colores disponibles a considerar (primeros k de la lista).
+ * @returns {string} Color en formato hexadecimal.
+ */
 export const generarColorAleatorio = (k) => {
   const colores = [
     '#FF6B6B', // Rojo
@@ -13,10 +19,18 @@ export const generarColorAleatorio = (k) => {
     '#ABEBC6', // Verde menta
   ];
   
+  // Selecciona un indice aleatorio entre 0 y k-1
   return colores[Math.floor(Math.random() * k)];
 };
 
-// Detectar si hay conflictos en el grafo coloreado
+
+/**
+ * Detecta los conflictos de color en un grafo coloreado.
+ * Un conflicto ocurre cuando dos nodos conectados tienen el mismo color.
+ * @param {Array} nodos - Lista de nodos del grafo.
+ * @param {Array} aristas - Lista de aristas del grafo.
+ * @returns {Array<string>} Lista de conflictos en formato "desde-hasta".
+ */
 export const detectarConflictos = (nodos, aristas) => {
   const conflictos = [];
   
@@ -34,17 +48,36 @@ export const detectarConflictos = (nodos, aristas) => {
   return conflictos;
 };
 
-// Contar el número de conflictos
+
+/**
+ * Cuenta el numero total de conflictos en un grafo.
+ * @param {Array} nodos - Lista de nodos.
+ * @param {Array} aristas - Lista de aristas.
+ * @returns {number} Numero de conflictos detectados.
+ */
 export const contarConflictos = (nodos, aristas) => {
   return detectarConflictos(nodos, aristas).length;
 };
 
-// Verificar si una coloración es válida (sin conflictos)
+
+/**
+ * Verifica si una coloracion es valida.
+ * Una coloracion es valida si no existe ningun conflicto.
+ * @param {Array} nodos - Lista de nodos.
+ * @param {Array} aristas - Lista de aristas.
+ * @returns {boolean} True si la coloracion es valida.
+ */
 export const esColoracionValida = (nodos, aristas) => {
   return contarConflictos(nodos, aristas) === 0;
 };
 
-// Obtener vecinos de un nodo
+
+/**
+ * Obtiene los vecinos (ids) de un nodo a partir de las aristas.
+ * @param {string|number} idNodo - Id del nodo.
+ * @param {Array} aristas - Lista de aristas.
+ * @returns {Array<string|number>} Lista de ids de nodos vecinos.
+ */
 export const obtenerVecinos = (idNodo, aristas) => {
   const vecinos = [];
   
@@ -59,7 +92,14 @@ export const obtenerVecinos = (idNodo, aristas) => {
   return vecinos;
 };
 
-// Obtener colores usados por los vecinos de un nodo
+
+/**
+ * Obtiene los colores usados por los vecinos de un nodo.
+ * @param {string|number} idNodo - Id del nodo objetivo.
+ * @param {Array} nodos - Lista de nodos.
+ * @param {Array} aristas - Lista de aristas.
+ * @returns {Array<string>} Lista de colores distintos usados por los vecinos.
+ */
 export const coloresVecinos = (idNodo, nodos, aristas) => {
   const vecinos = obtenerVecinos(idNodo, aristas);
   const colores = new Set();
