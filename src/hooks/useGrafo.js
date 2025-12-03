@@ -10,8 +10,8 @@ import { Arista } from "../utilidades/Arista";
  * @returns {Object} Estados y funciones para manipular el grafo.
  */
 export const useGrafo = () => {
+    const MAX_NODOS = 60;
 
-    // Estado principal que contiene el grafo completo
     const [grafo, setGrafo] = useState(() => {
         const g = new Grafo();
 
@@ -33,6 +33,11 @@ export const useGrafo = () => {
      * El id se genera automaticamente con el contador interno.
      */
     const agregarNodo = () => {
+        if (grafo.nodos.length >= MAX_NODOS) {
+            alert(`No se pueden agregar más de ${MAX_NODOS} nodos`);
+            return;
+        }
+
         setGrafo(p => {
             const nuevoGrafo = p.clonar();
             nuevoGrafo.agregarNodo(new Nodo(contarNodos));
@@ -79,7 +84,7 @@ export const useGrafo = () => {
      * La cantidad de nodos y aristas se genera aleatoriamente.
      */
     const generarGrafoAleatorio = () => {
-        const numNodos = Math.floor(Math.random() * 5) + 5;
+        const numNodos = Math.min(Math.floor(Math.random() * 58) + 3, MAX_NODOS);
         const nuevoGrafo = new Grafo();
 
         // Crear nodos
@@ -131,6 +136,8 @@ export const useGrafo = () => {
         agregarArista,
         generarGrafoAleatorio,
         actualizarGrafo,
-        conflictos: grafo.detectarConflictos()
+        conflictos: grafo.detectarConflictos(),
+        maxNodos: MAX_NODOS,
+        nodosRestantes: MAX_NODOS - grafo.nodos.length
     };
 };
