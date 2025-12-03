@@ -1,6 +1,16 @@
 import { useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+/**
+ * PanelEstadisticas
+ * Muestra informacion detallada del resultado de la ejecucion de algoritmos,
+ * incluyendo resultados actuales, grafica de evolucion y el historial completo.
+ *
+ * @param {Object} props
+ * @param {Object|null} props.estadisticas - Datos de la ultima ejecucion.
+ * @param {Array<Object>} props.historialEjecuciones - Lista completa de ejecuciones.
+ * @returns {JSX.Element}
+ */
 const PanelEstadisticas = ({ estadisticas, historialEjecuciones }) => {
   const [graficaExpandida, setGraficaExpandida] = useState(false);
   const [modoRendimiento, setModoRendimiento] = useState(true);
@@ -278,6 +288,7 @@ const PanelEstadisticas = ({ estadisticas, historialEjecuciones }) => {
                 </ResponsiveContainer>
               </div>
             </div>
+
           </div>
         )}
 

@@ -1,12 +1,35 @@
 import { useState } from 'react';
 
+/**
+ * PanelAlgoritmo
+ * Panel de configuracion y ejecucion de los algoritmos de coloracion,
+ * ademas de mostrar un resumen de las estadisticas de la ultima ejecucion.
+ *
+ * @param {Object} props
+ * @param {Function} props.onEjecutarAlgoritmo - Funcion que dispara la ejecucion del algoritmo.
+ * @param {Object|null} props.estadisticas - Estadisticas de la ultima ejecucion.
+ * @returns {JSX.Element}
+ */
 const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
+  // tipoAlgoritmo: "lasVegas" o "monteCarlo"
   const [tipoAlgoritmo, setTipoAlgoritmo] = useState('lasVegas');
+
+  // numColores: k para la coloracion
   const [numColores, setNumColores] = useState(3);
+
+  // maxIteraciones: limite de iteraciones o intentos
   const [maxIteraciones, setMaxIteraciones] = useState(1000);
+
+  // buscarSolucionValida: solo aplica cuando no hay auto-incremento de k
   const [buscarSolucionValida, setBuscarSolucionValida] = useState(true);
+
+  // autoIncrementoK: si esta activo, el algoritmo incrementa k automaticamente
   const [autoIncrementoK, setAutoIncrementoK] = useState(false);
 
+  /**
+   * ejecutar
+   * Construye un objeto de configuracion y llama al callback onEjecutarAlgoritmo.
+   */
   const ejecutar = () => {
     onEjecutarAlgoritmo({
       tipo: tipoAlgoritmo,
@@ -24,6 +47,7 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Configuración */}
         <div className="space-y-4">
+          {/* Tipo de algoritmo */}
           <div>
             <label className="block font-semibold mb-2">Tipo de Algoritmo</label>
             <select
@@ -36,6 +60,7 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
             </select>
           </div>
 
+          {/* Numero de colores (k) */}
           <div>
             <label className="block font-semibold mb-2">
               Número de Colores (k): {numColores}
@@ -51,11 +76,12 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
             />
             {autoIncrementoK && (
               <p className="text-xs text-blue-600 mt-1">
-                ℹ️ Se usará como k inicial para auto-incremento
+                Info: este valor se usara como k inicial para el auto-incremento.
               </p>
             )}
           </div>
 
+          {/* Maximo de iteraciones o intentos por k */}
           <div>
             <label className="block font-semibold mb-2">
               {autoIncrementoK ? 'Intentos por valor de k:' : 'Máximo de Iteraciones:'} {maxIteraciones}
@@ -71,11 +97,12 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
             />
             {autoIncrementoK && maxIteraciones < 1000 && (
               <p className="text-xs text-red-600 mt-1">
-                ⚠️ Recomendado: mínimo 1000 intentos
+                Se recomienda un minimo de 1000 intentos para obtener mejores resultados.
               </p>
             )}
           </div>
 
+          {/* Opcion de buscar solucion valida solo cuando no hay auto-incremento */}
           {!autoIncrementoK && (
             <div className="flex items-center gap-2">
               <input
@@ -86,11 +113,12 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
                 className="w-4 h-4"
               />
               <label htmlFor="solucionValida" className="font-semibold">
-                Buscar solución válida (sin límite de intentos)
+                Buscar solución válida (ignora el límite de iteraciones hasta encontrarla)
               </label>
             </div>
           )}
 
+          {/* Auto-incremento de k */}
           <div className="border-2 border-purple-300 bg-purple-50 rounded p-3">
             <div className="flex items-center justify-center gap-2">
               <input
@@ -101,19 +129,20 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
                 className="w-4 h-4"
               />
               <label htmlFor="autoIncremento" className="font-semibold text-purple-700">
-                🧠 Auto-incremento de k
+                Auto-incremento de k
               </label>
             </div>
             <p className="text-xs text-gray-600 mt-2 text-center">
-              Si no encuentra solución, incrementa k automáticamente
+              Si no se encuentra solución con el k actual, se incrementa k automaticamente.
             </p>
           </div>
 
+          {/* Boton de ejecucion */}
           <button
             onClick={ejecutar}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded text-lg"
           >
-            🚀 Ejecutar Algoritmo
+            Ejecutar Algoritmo
           </button>
         </div>
 
@@ -123,23 +152,28 @@ const PanelAlgoritmo = ({ onEjecutarAlgoritmo, estadisticas }) => {
           {estadisticas ? (
             <div className="space-y-2 text-sm">
               <p><strong>Algoritmo:</strong> {estadisticas.tipo}</p>
+
               {estadisticas.autoIncremento && (
                 <>
                   <p><strong>k inicial:</strong> {estadisticas.kInicial}</p>
                   <p><strong>k final:</strong> {estadisticas.kFinal}</p>
                 </>
               )}
+
               <p><strong>Iteraciones:</strong> {estadisticas.iteraciones}</p>
-              <p><strong>Tiempo:</strong> {estadisticas.tiempo}ms</p>
+              <p><strong>Tiempo:</strong> {estadisticas.tiempo} ms</p>
               <p><strong>Conflictos:</strong> {estadisticas.conflictos}</p>
-              <p><strong>Estado:</strong> 
+              <p>
+                <strong>Estado:</strong>{' '}
                 <span className={estadisticas.exito ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
-                  {estadisticas.exito ? ' ✓ Solución válida' : ' ✗ Con conflictos'}
+                  {estadisticas.exito ? 'Solución válida' : 'Coloración con conflictos'}
                 </span>
               </p>
             </div>
           ) : (
-            <p className="text-gray-500 italic">Ejecuta un algoritmo para ver estadísticas</p>
+            <p className="text-gray-500 italic">
+              Ejecuta un algoritmo para ver estadísticas.
+            </p>
           )}
         </div>
       </div>
