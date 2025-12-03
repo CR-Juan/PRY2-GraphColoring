@@ -1,3 +1,7 @@
+/**
+ * Tailwind imports
+ * Carga las capas de estilo base, componentes y utilidades.
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
