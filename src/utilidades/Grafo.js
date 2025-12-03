@@ -119,12 +119,20 @@ export class Grafo {
 
     /**
      * Devuelve los pares de nodos que generan conflicto de color.
-     * @returns {Array} Lista de pares [id1, id2].
+     * @returns {Array<string>} Lista de strings en formato "desde-hasta" y "hasta-desde".
      */
     detectarConflictos() {
-        return this.aristas
+        const conflictos = [];
+    
+        this.aristas
             .filter(a => a.tieneConflicto(this.nodos))
-            .map(a => [a.desde, a.hasta]);
+            .forEach(a => {
+                // Agregar ambas direcciones para que siempre haga match
+                conflictos.push(`${a.desde}-${a.hasta}`);
+                conflictos.push(`${a.hasta}-${a.desde}`);
+            });
+    
+        return conflictos;
     }
 
     /**
@@ -132,7 +140,8 @@ export class Grafo {
      * @returns {number} Cantidad de conflictos.
      */
     contarConflictos() {
-        return this.detectarConflictos().length;
+        // Dividir entre 2 porque cada conflicto se guarda en ambas direcciones
+        return this.detectarConflictos().length / 2;
     }
 
     /**

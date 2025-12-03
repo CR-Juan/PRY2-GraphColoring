@@ -36,6 +36,13 @@ function App() {
     conflictos: conflictosVisuales
   } = useGrafo();
 
+  // AGREGAR ESTO PARA DEBUGGEAR 👇
+  console.log('=== DEBUG ===');
+  console.log('Conflictos visuales:', conflictosVisuales);
+  console.log('Nodos:', nodos.map(n => n.toJSON()));
+  console.log('Aristas:', aristas.map(a => a.toJSON()));
+  console.log('============');
+
   // ----- useColoracion -----
   // estadisticas: datos del ultimo algoritmo ejecutado
   // historialEjecuciones: historial de ejecuciones anteriores
