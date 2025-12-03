@@ -1,3 +1,9 @@
+/*-------------------------------------------------
+#nombre: root
+#entrada: Ninguna directa; es el contenedor principal de la app.
+#salida: Centra el contenido y limita el ancho máximo.
+#restricciones: El ancho nunca supera 1280px.
+-------------------------------------------------*/
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,19 +11,45 @@
   text-align: center;
 }
 
+/*-------------------------------------------------
+#nombre: logo
+#entrada: Imagen con clase .logo.
+#salida: Aplica tamaño, espacio interno y transición visual.
+#restricciones: La animación solo afecta el filtro CSS.
+-------------------------------------------------*/
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
+
+/*-------------------------------------------------
+#nombre: logo:hover
+#entrada: Evento hover del mouse.
+#salida: Aplica efecto de sombra luminosa.
+#restricciones: Solo se activa al pasar el cursor.
+-------------------------------------------------*/
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
+/*-------------------------------------------------
+#nombre: logo.react:hover
+#entrada: Elementos con clase react al pasar el cursor.
+#salida: Cambia el color de la sombra para React.
+#restricciones: Solo funciona si tiene ambas clases.
+-------------------------------------------------*/
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+/*-------------------------------------------------
+#nombre: logo-spin
+#entrada: Animación CSS.
+#salida: Hace girar el logo infinitamente.
+#restricciones: Debe ser llamada por animation.
+-------------------------------------------------*/
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -27,16 +59,34 @@
   }
 }
 
+/*-------------------------------------------------
+#nombre: media-motion
+#entrada: Preferencia del sistema operativo.
+#salida: Activa animación solo si el usuario no pide reducir movimiento.
+#restricciones: Respeta configuraciones de accesibilidad.
+-------------------------------------------------*/
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
 }
 
+/*-------------------------------------------------
+#nombre: card
+#entrada: Contenedor con clase .card.
+#salida: Añade espacio interno.
+#restricciones: Solo afecta padding.
+-------------------------------------------------*/
 .card {
   padding: 2em;
 }
 
+/*-------------------------------------------------
+#nombre: read-the-docs
+#entrada: Texto informativo.
+#salida: Aplica tono gris claro.
+#restricciones: Solo cambia el color del texto.
+-------------------------------------------------*/
 .read-the-docs {
   color: #888;
 }
