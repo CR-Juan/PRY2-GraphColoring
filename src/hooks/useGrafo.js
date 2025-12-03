@@ -4,6 +4,8 @@ import { Nodo } from "../utilidades/Nodo";
 import { Arista } from "../utilidades/Arista";
 
 export const useGrafo = () => {
+    const MAX_NODOS = 60;
+
     const [grafo, setGrafo] = useState(() => {
         const g = new Grafo();
         g.agregarNodo(new Nodo(1));
@@ -17,6 +19,11 @@ export const useGrafo = () => {
     const [contarNodos, setContarNodos] = useState(4);
 
     const agregarNodo = () => {
+        if (grafo.nodos.length >= MAX_NODOS) {
+            alert(`No se pueden agregar más de ${MAX_NODOS} nodos`);
+            return;
+        }
+
         setGrafo(p => {
             const nuevoGrafo = p.clonar();
             nuevoGrafo.agregarNodo(new Nodo(contarNodos));
@@ -50,7 +57,7 @@ export const useGrafo = () => {
     };
 
     const generarGrafoAleatorio = () => {
-        const numNodos = Math.floor(Math.random() * 118) + 3;
+        const numNodos = Math.min(Math.floor(Math.random() * 58) + 3, MAX_NODOS);
         const nuevoGrafo = new Grafo();
 
         for (let i = 1; i <= numNodos; i++) {
@@ -93,6 +100,8 @@ export const useGrafo = () => {
         agregarArista,
         generarGrafoAleatorio,
         actualizarGrafo,
-        conflictos: grafo.detectarConflictos()
+        conflictos: grafo.detectarConflictos(),
+        maxNodos: MAX_NODOS,
+        nodosRestantes: MAX_NODOS - grafo.nodos.length
     };
 };
