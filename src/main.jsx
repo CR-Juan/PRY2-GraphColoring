@@ -12,7 +12,6 @@ createRoot(root).render(
   // StrictMode ayuda a detectar errores y malas practicas en desarrollo
   <StrictMode>
 
-    // Componente principal de la aplicacion
     <App />
 
   </StrictMode>
