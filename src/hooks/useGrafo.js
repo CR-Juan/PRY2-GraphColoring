@@ -50,7 +50,7 @@ export const useGrafo = () => {
     };
 
     const generarGrafoAleatorio = () => {
-        const numNodos = Math.floor(Math.random() * 5) + 5;
+        const numNodos = Math.floor(Math.random() * 118) + 3; //
         const nuevoGrafo = new Grafo();
 
         for (let i = 1; i <= numNodos; i++) {
